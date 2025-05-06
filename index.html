@@ -2,122 +2,174 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>HALO Chatbot</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="https://regenmedsa.org/wp-content/uploads/sites/49/2020/11/BBG_large.jpg" type="image/jpg">
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: 'Inter', sans-serif;
-      background: #f3f4f6;
       margin: 0;
-      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f8;
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: flex-start;
       height: 100vh;
     }
-    h1 {
-      margin-top: 20px;
-      color: #111827;
-    }
-    #chat-box {
-      width: 90%;
-      max-width: 600px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+
+    header {
+      width: 100%;
       padding: 20px;
-      margin-top: 20px;
-      overflow-y: auto;
-      flex: 1;
+      background-color: #003366;
+      color: white;
+      text-align: center;
     }
-    .message {
-      margin-bottom: 15px;
-      line-height: 1.5;
+
+    header img {
+      max-height: 60px;
+      vertical-align: middle;
     }
-    .user {
-      text-align: right;
-      color: #2563eb;
+
+    header h1 {
+      margin: 10px 0 0;
+      font-size: 1.8rem;
     }
-    .bot {
-      text-align: left;
-      color: #111827;
-    }
-    #input-form {
-      display: flex;
-      margin-top: 10px;
+
+    .chat-container {
+      margin-top: 30px;
       width: 90%;
       max-width: 600px;
+      background-color: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
-    #user-input {
+
+    .chat-box {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      height: 400px;
+    }
+
+    .chat-message {
+      margin-bottom: 15px;
+      padding: 12px 15px;
+      border-radius: 12px;
+      max-width: 80%;
+      line-height: 1.4;
+    }
+
+    .user {
+      background-color: #e1f5fe;
+      align-self: flex-end;
+    }
+
+    .bot {
+      background-color: #f0f0f0;
+      align-self: flex-start;
+    }
+
+    .input-area {
+      display: flex;
+      border-top: 1px solid #ddd;
+      padding: 10px;
+      background-color: #fafafa;
+    }
+
+    input[type="text"] {
       flex: 1;
       padding: 12px;
       font-size: 1rem;
-      border-radius: 6px;
-      border: 1px solid #d1d5db;
-      outline: none;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      margin-right: 10px;
     }
+
     button {
-      padding: 12px 20px;
-      margin-left: 10px;
-      border: none;
-      background: #2563eb;
+      background-color: #007bff;
       color: white;
-      border-radius: 6px;
-      font-weight: 600;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 10px;
       cursor: pointer;
+      font-weight: bold;
     }
+
     button:hover {
-      background: #1d4ed8;
+      background-color: #0056b3;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #888;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>HALO Chatbot</h1>
-  <div id="chat-box"></div>
-  <form id="input-form">
-    <input type="text" id="user-input" placeholder="Type your message..." autocomplete="off" />
-    <button type="submit">Send</button>
-  </form>
+
+  <header>
+    <img src="https://regenmedsa.org/wp-content/uploads/sites/49/2020/11/BBG_large.jpg" alt="BBG Logo" />
+    <h1>HALO Chatbot</h1>
+  </header>
+
+  <div class="chat-container">
+    <div class="chat-box" id="chat-box"></div>
+    <div class="input-area">
+      <input type="text" id="user-input" placeholder="Type your message..." />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <footer>Powered by BioBridge Global | HALO AI Assistant</footer>
 
   <script>
-    const form = document.getElementById('input-form');
-    const input = document.getElementById('user-input');
-    const chatBox = document.getElementById('chat-box');
+    const chatBox = document.getElementById("chat-box");
+    const inputField = document.getElementById("user-input");
 
-    function addMessage(sender, text) {
-      const div = document.createElement('div');
-      div.className = `message ${sender}`;
-      div.innerText = `${text}`;
-      chatBox.appendChild(div);
+    function appendMessage(sender, text) {
+      const msg = document.createElement("div");
+      msg.classList.add("chat-message", sender);
+      msg.innerText = text;
+      chatBox.appendChild(msg);
       chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const message = input.value.trim();
-      if (!message) return;
+    async function sendMessage() {
+      const userMessage = inputField.value.trim();
+      if (!userMessage) return;
 
-      addMessage('user', message);
-      input.value = '';
+      appendMessage("user", userMessage);
+      inputField.value = "";
 
-      const response = await fetch('/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message })
-      });
+      try {
+        const res = await fetch("https://haloai-production.up.railway.app/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: userMessage }),
+        });
 
-      const data = await response.json();
-      addMessage('bot', data.response || data.error || "An error occurred.");
-    });
+        const data = await res.json();
+        appendMessage("bot", data.response || "Sorry, no response.");
+      } catch (err) {
+        appendMessage("bot", "Error reaching the server.");
+      }
+    }
 
-    // Allow Enter key to send
-    input.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        form.dispatchEvent(new Event('submit'));
+    inputField.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        sendMessage();
       }
     });
   </script>
+
 </body>
 </html>
