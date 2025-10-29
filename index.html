@@ -1,62 +1,196 @@
-<!-- place this just before </body> -->
-<style>
-  /* Floating chat bubble container */
-  #haloBubble {
-    position: fixed;
-    bottom: 25px;
-    right: 25px;
-    z-index: 9999;
-  }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Halo Ticket Assistant</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f1f2f5;
+      color: #333;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    body.dark { background-color: #1e1e1e; color: #e0e0e0; }
 
-  /* Chat frame styling */
-  #haloBubble iframe, #haloBubble #halo-chat {
-    width: 400px;
-    height: 520px;
-    display: none;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  }
+    .header { background-color: #e30613; padding: 1.5rem; text-align: center; position: relative; }
+    .header img { max-width: 200px; margin-bottom: 10px; }
+    h1 { font-size: 1.8rem; margin: 0; color: white; }
 
-  /* Bubble button */
-  #haloToggle {
-    background-color: #e30613;
-    color: #fff;
-    border: none;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    cursor: pointer;
-    font-size: 26px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  #haloToggle:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
-  }
-</style>
+    .toggle-container { position: absolute; top: 1rem; right: 1rem; }
+    .toggle-container input { cursor: pointer; }
 
-<div id="haloBubble">
-  <button id="haloToggle"><i class="fa-solid fa-comments"></i></button>
-  <div id="halo-chat"></div>
-</div>
+    .chat-container {
+      max-width: 600px; margin: 2rem auto; background: white; border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden; display: flex; flex-direction: column;
+      transition: background 0.3s;
+    }
+    body.dark .chat-container { background: #2a2a2a; }
 
-<script>
-  // Bubble toggle logic
-  const toggleBtn = document.getElementById("haloToggle");
-  const haloChat = document.getElementById("halo-chat");
+    .chat-box { padding: 1rem; height: 600px; overflow-y: auto; }
+    .message { display: flex; align-items: flex-start; margin-bottom: 1rem; }
+    .message .avatar {
+      width: 36px; height: 36px; border-radius: 50%; background-color: #ccc; display: flex;
+      align-items: center; justify-content: center; font-weight: bold; color: white; margin-right: 0.75rem;
+    }
+    .message.user .avatar { background-color: #e30613; }
+    .message.bot .avatar { background-color: #555; }
+    .bubble { background: #f0f0f0; padding: 0.75rem 1rem; border-radius: 16px; max-width: 80%; }
+    body.dark .bubble { background: #444; }
 
-  toggleBtn.addEventListener("click", () => {
-    const isOpen = haloChat.style.display === "block";
-    haloChat.style.display = isOpen ? "none" : "block";
-  });
+    .input-container { display: flex; padding: 1rem; background: #f9f9f9; }
+    body.dark .input-container { background: #1a1a1a; }
 
-  // Halo Agent Support config
-  var haloChatConfig = {
-    chatServiceUrl: "https://agent-support.qualtexlabs.org/api",
-    configId: "c68ef4cb-6e6b-4ca0-8d8b-cee97181eb41",
-    configKey: "ba8f6b7f-b61c-408c-ab04-3d61cc0e7af7",
-  };
-</script>
-<script src="https://agent-support.qualtexlabs.org/chat/index.js"></script>
+    input[type="text"] {
+      flex: 1; padding: 0.75rem 1rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 12px; margin-right: 0.5rem; outline: none;
+    }
+    button { padding: 0.75rem 1rem; background-color: #e30613; border: none; color: white; border-radius: 12px; cursor: pointer; }
+
+    .footer { text-align: center; margin: 1rem; font-size: 0.85rem; color: #888; }
+    .typing-indicator { font-size: 0.9rem; margin-left: 2.5rem; color: #888; font-style: italic; animation: blink 1.5s steps(1) infinite; }
+    @keyframes blink { 50% { opacity: 0.2; } }
+
+    /* Floating bubble styles */
+    #haloBubble { position: fixed; right: 24px; bottom: 24px; z-index: 9999; }
+    #haloToggle {
+      background: #e30613; color: #fff; border: none; border-radius: 50%;
+      width: 58px; height: 58px; cursor: pointer; font-size: 24px;
+      box-shadow: 0 8px 22px rgba(0,0,0,.28);
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    #haloPanel {
+      display: none; margin-top: 10px; width: 380px; height: 520px; border-radius: 16px;
+      background: #fff; overflow: hidden; box-shadow: 0 12px 28px rgba(0,0,0,.25);
+    }
+    #halo-chat { width: 100%; height: 100%; }
+    @media (max-width: 480px) { #haloPanel { width: 92vw; height: 70vh; } }
+  </style>
+</head>
+<body>
+  <div class="toggle-container">
+    <label>
+      <input type="checkbox" id="darkToggle" />
+      🌙 Dark Mode
+    </label>
+  </div>
+
+  <div class="header">
+    <img src="https://regenmedsa.org/wp-content/uploads/sites/49/2020/11/BBG_large.jpg" alt="BBG Logo"/>
+    <h1>Halo Ticket Assistant</h1>
+  </div>
+
+  <div class="chat-container">
+    <div class="chat-box" id="chatBox"></div>
+    <div class="input-container">
+      <input type="text" id="messageInput" placeholder="Type your message..."/>
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <div class="footer">Powered by BioBridge Global | HALO AI Assistant</div>
+
+  <script>
+    const chatBox = document.getElementById("chatBox");
+    const input = document.getElementById("messageInput");
+    const darkToggle = document.getElementById("darkToggle");
+
+    darkToggle.addEventListener("change", () => {
+      document.body.classList.toggle("dark");
+    });
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") sendMessage(); });
+
+    function sendMessage() {
+      const text = input.value.trim();
+      if (!text) return;
+
+      appendMessage("user", text);
+      input.value = "";
+
+      const typing = document.createElement("div");
+      typing.className = "typing-indicator";
+      typing.textContent = "Assistant is typing...";
+      chatBox.appendChild(typing);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      fetch("https://haloai-production.up.railway.app/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text })
+      })
+      .then((res) => res.json())
+      .then((data) => {
+        chatBox.removeChild(typing);
+        appendMessage("bot", data.response);
+      })
+      .catch(() => {
+        chatBox.removeChild(typing);
+        appendMessage("bot", "Something went wrong. Please try again.");
+      });
+    }
+
+    // ✅ bug fix: use template literals
+    function appendMessage(sender, text) {
+      const msg = document.createElement("div");
+      msg.className = `message ${sender}`;
+      msg.innerHTML = `
+        <div class="avatar">${sender === "user" ? "🧑" : "🤖"}</div>
+        <div class="bubble">${text}</div>
+      `;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  </script>
+
+  <!-- Floating bottom-right bubble with the vendor chat -->
+  <div id="haloBubble" aria-live="polite">
+    <button id="haloToggle" title="Open Agent Support">
+      <i class="fa-solid fa-comments"></i>
+    </button>
+    <div id="haloPanel">
+      <!-- Vendor will mount here if supported -->
+      <div id="halo-chat"></div>
+    </div>
+  </div>
+
+  <script>
+    // Toggle the pop-up panel open/closed
+    const haloToggle = document.getElementById('haloToggle');
+    const haloPanel  = document.getElementById('haloPanel');
+    haloToggle.addEventListener('click', () => {
+      haloPanel.style.display = (haloPanel.style.display === 'block') ? 'none' : 'block';
+    });
+
+    // Provide config BEFORE loading vendor script
+    window.haloChatConfig = {
+      chatServiceUrl: "https://agent-support.qualtexlabs.org/api",
+      configId: "c68ef4cb-6e6b-4ca0-8d8b-cee97181eb41",
+      configKey: "ba8f6b7f-b61c-408c-ab04-3d61cc0e7af7",
+      // If their SDK supports it, this forces mounting inside our pop-up:
+      containerId: "halo-chat"
+    };
+  </script>
+
+  <!-- per vendor instruction: add to END of the body -->
+  <script src="https://agent-support.qualtexlabs.org/chat/index.js"></script>
+
+  <script>
+    // Optional: try common mount methods after the SDK loads; hide empty panel if SDK injects its own launcher.
+    (function ensureMount(){
+      const attempt = () => {
+        try {
+          if (window.HaloChat?.mount) window.HaloChat.mount('#halo-chat');
+          else if (window.haloChat?.mount) window.haloChat.mount('#halo-chat');
+        } catch(_) {}
+        setTimeout(() => {
+          const mounted = document.getElementById('halo-chat')?.childElementCount > 0;
+          if (!mounted) haloPanel.style.display = 'none'; // avoid blank white card
+        }, 800);
+      };
+      if (document.readyState === 'complete') attempt();
+      else window.addEventListener('load', attempt);
+    })();
+  </script>
+</body>
+</html>
