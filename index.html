@@ -19,12 +19,18 @@
     .header img { max-width: 200px; margin-bottom: 10px; }
     h1 { font-size: 1.8rem; margin: 0; color: white; }
 
-    .toggle-container { position: absolute; top: 1rem; right: 1rem; }
+    .toggle-container { position: absolute; top: 1rem; right: 1rem; color: white; font-weight: 600; }
     .toggle-container input { cursor: pointer; }
 
     .chat-container {
-      max-width: 600px; margin: 2rem auto; background: white; border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden; display: flex; flex-direction: column;
+      max-width: 600px;
+      margin: 2rem auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
       transition: background 0.3s;
     }
     body.dark .chat-container { background: #2a2a2a; }
@@ -32,48 +38,45 @@
     .chat-box { padding: 1rem; height: 600px; overflow-y: auto; }
     .message { display: flex; align-items: flex-start; margin-bottom: 1rem; }
     .message .avatar {
-      width: 36px; height: 36px; border-radius: 50%; background-color: #ccc; display: flex;
-      align-items: center; justify-content: center; font-weight: bold; color: white; margin-right: 0.75rem;
+      width: 36px; height: 36px; border-radius: 50%; background-color: #ccc;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: bold; color: white; margin-right: 0.75rem;
     }
     .message.user .avatar { background-color: #e30613; }
     .message.bot .avatar { background-color: #555; }
-    .bubble { background: #f0f0f0; padding: 0.75rem 1rem; border-radius: 16px; max-width: 80%; }
+    .bubble {
+      background: #f0f0f0; padding: 0.75rem 1rem; border-radius: 16px; max-width: 80%;
+    }
     body.dark .bubble { background: #444; }
 
     .input-container { display: flex; padding: 1rem; background: #f9f9f9; }
     body.dark .input-container { background: #1a1a1a; }
 
     input[type="text"] {
-      flex: 1; padding: 0.75rem 1rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 12px; margin-right: 0.5rem; outline: none;
+      flex: 1; padding: 0.75rem 1rem; font-size: 1rem;
+      border: 1px solid #ccc; border-radius: 12px; margin-right: 0.5rem; outline: none;
     }
-    button { padding: 0.75rem 1rem; background-color: #e30613; border: none; color: white; border-radius: 12px; cursor: pointer; }
-
+    button {
+      padding: 0.75rem 1rem;
+      background-color: #e30613;
+      border: none;
+      color: white;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
     .footer { text-align: center; margin: 1rem; font-size: 0.85rem; color: #888; }
-    .typing-indicator { font-size: 0.9rem; margin-left: 2.5rem; color: #888; font-style: italic; animation: blink 1.5s steps(1) infinite; }
-    @keyframes blink { 50% { opacity: 0.2; } }
 
-    /* Floating bubble styles */
-    #haloBubble { position: fixed; right: 24px; bottom: 24px; z-index: 9999; }
-    #haloToggle {
-      background: #e30613; color: #fff; border: none; border-radius: 50%;
-      width: 58px; height: 58px; cursor: pointer; font-size: 24px;
-      box-shadow: 0 8px 22px rgba(0,0,0,.28);
-      display: inline-flex; align-items: center; justify-content: center;
+    .typing-indicator {
+      font-size: 0.9rem; margin-left: 2.5rem; color: #888;
+      font-style: italic; animation: blink 1.5s steps(1) infinite;
     }
-    #haloPanel {
-      display: none; margin-top: 10px; width: 380px; height: 520px; border-radius: 16px;
-      background: #fff; overflow: hidden; box-shadow: 0 12px 28px rgba(0,0,0,.25);
-    }
-    #halo-chat { width: 100%; height: 100%; }
-    @media (max-width: 480px) { #haloPanel { width: 92vw; height: 70vh; } }
+    @keyframes blink { 50% { opacity: 0.2; } }
   </style>
 </head>
 <body>
   <div class="toggle-container">
-    <label>
-      <input type="checkbox" id="darkToggle" />
-      🌙 Dark Mode
-    </label>
+    <label><input type="checkbox" id="darkToggle" /> 🌙 Dark Mode</label>
   </div>
 
   <div class="header">
@@ -96,10 +99,8 @@
     const input = document.getElementById("messageInput");
     const darkToggle = document.getElementById("darkToggle");
 
-    darkToggle.addEventListener("change", () => {
-      document.body.classList.toggle("dark");
-    });
-    input.addEventListener("keydown", (e) => { if (e.key === "Enter") sendMessage(); });
+    darkToggle.addEventListener("change", () => document.body.classList.toggle("dark"));
+    input.addEventListener("keydown", e => { if (e.key === "Enter") sendMessage(); });
 
     function sendMessage() {
       const text = input.value.trim();
@@ -119,8 +120,8 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: text })
       })
-      .then((res) => res.json())
-      .then((data) => {
+      .then(res => res.json())
+      .then(data => {
         chatBox.removeChild(typing);
         appendMessage("bot", data.response);
       })
@@ -130,7 +131,6 @@
       });
     }
 
-    // ✅ bug fix: use template literals
     function appendMessage(sender, text) {
       const msg = document.createElement("div");
       msg.className = `message ${sender}`;
@@ -143,54 +143,18 @@
     }
   </script>
 
-  <!-- Floating bottom-right bubble with the vendor chat -->
-  <div id="haloBubble" aria-live="polite">
-    <button id="haloToggle" title="Open Agent Support">
-      <i class="fa-solid fa-comments"></i>
-    </button>
-    <div id="haloPanel">
-      <!-- Vendor will mount here if supported -->
-      <div id="halo-chat"></div>
-    </div>
-  </div>
-
+  <!-- ---------------- Vendor embed (Option A) ---------------- -->
+  <!-- add this exactly at the END of your html body -->
   <script>
-    // Toggle the pop-up panel open/closed
-    const haloToggle = document.getElementById('haloToggle');
-    const haloPanel  = document.getElementById('haloPanel');
-    haloToggle.addEventListener('click', () => {
-      haloPanel.style.display = (haloPanel.style.display === 'block') ? 'none' : 'block';
-    });
-
-    // Provide config BEFORE loading vendor script
-    window.haloChatConfig = {
+    var haloChatConfig = {
       chatServiceUrl: "https://agent-support.qualtexlabs.org/api",
       configId: "c68ef4cb-6e6b-4ca0-8d8b-cee97181eb41",
-      configKey: "ba8f6b7f-b61c-408c-ab04-3d61cc0e7af7",
-      // If their SDK supports it, this forces mounting inside our pop-up:
-      containerId: "halo-chat"
+      configKey: "ba8f6b7f-b61c-408c-ab04-3d61cc0e7af7"
     };
   </script>
-
-  <!-- per vendor instruction: add to END of the body -->
-  <script src="https://agent-support.qualtexlabs.org/chat/index.js"></script>
-
-  <script>
-    // Optional: try common mount methods after the SDK loads; hide empty panel if SDK injects its own launcher.
-    (function ensureMount(){
-      const attempt = () => {
-        try {
-          if (window.HaloChat?.mount) window.HaloChat.mount('#halo-chat');
-          else if (window.haloChat?.mount) window.haloChat.mount('#halo-chat');
-        } catch(_) {}
-        setTimeout(() => {
-          const mounted = document.getElementById('halo-chat')?.childElementCount > 0;
-          if (!mounted) haloPanel.style.display = 'none'; // avoid blank white card
-        }, 800);
-      };
-      if (document.readyState === 'complete') attempt();
-      else window.addEventListener('load', attempt);
-    })();
-  </script>
+  <script src="https://agent-support.qualtexlabs.org/chat/index.js" defer></script>
+  <!-- ---------------------------------------------------------- -->
 </body>
 </html>
+
+
