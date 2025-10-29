@@ -1,34 +1,60 @@
+// Matches IDs in index (1).html
 async function sendMessage() {
-    const input = document.getElementById("userInput");
-    const message = input.value.trim();
-    if (!message) return;
+  const input = document.getElementById("messageInput");
+  const text = input.value.trim();
+  if (!text) return;
 
-    // Show user message
-    const chat = document.getElementById("chat");
-    const userBubble = document.createElement("div");
-    userBubble.className = "user-bubble";
-    userBubble.innerText = message;
-    chat.appendChild(userBubble);
+  appendMessage("user", text);
+  input.value = "";
 
-    input.value = "";
+  // typing indicator
+  const chatBox = document.getElementById("chatBox");
+  const typing = document.createElement("div");
+  typing.className = "typing-indicator";
+  typing.textContent = "Assistant is typing...";
+  chatBox.appendChild(typing);
+  chatBox.scrollTop = chatBox.scrollHeight;
 
-    // Send to backend
-    try {
-        const res = await fetch("https://haloai-production.up.railway.app/chat", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message }),
-        });
-
-        const data = await res.json();
-        const botBubble = document.createElement("div");
-        botBubble.className = "bot-bubble";
-        botBubble.innerText = data.response || data.error || "No response.";
-        chat.appendChild(botBubble);
-    } catch (err) {
-        const errorBubble = document.createElement("div");
-        errorBubble.className = "bot-bubble error";
-        errorBubble.innerText = "❌ Error contacting the bot.";
-        chat.appendChild(errorBubble);
-    }
+  try {
+    const res = await fetch("https://haloai-production.up.railway.app/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text })
+    });
+    const data = await res.json();
+    chatBox.removeChild(typing);
+    appendMessage("bot", data.response ?? "No response.");
+  } catch (err) {
+    chatBox.removeChild(typing);
+    appendMessage("bot", "❌ Error contacting the bot.");
+  }
 }
+
+function appendMessage(sender, text) {
+  const chatBox = document.getElementById("chatBox");
+  const msg = document.createElement("div");
+  msg.className = `message ${sender}`;
+  msg.innerHTML = `
+    <div class="avatar">${sender === "user" ? "🧑" : "🤖"}</div>
+    <div class="bubble">${text}</div>
+  `;
+  chatBox.appendChild(msg);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// Dark mode toggle (kept external to avoid duplicate handlers)
+document.addEventListener("DOMContentLoaded", () => {
+  const darkToggle = document.getElementById("darkToggle");
+  if (darkToggle) {
+    darkToggle.addEventListener("change", () => {
+      document.body.classList.toggle("dark");
+    });
+  }
+  const input = document.getElementById("messageInput");
+  if (input) {
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
+  }
+});
+
