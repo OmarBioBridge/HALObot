@@ -73,11 +73,11 @@
     }
     @keyframes blink { 50% { opacity: 0.2; } }
 
-    /* Optional: helper button to programmatically open chat using Events API */
+    /* Optional helper button (hidden by default) */
     .open-support {
       position: fixed; right: 24px; bottom: 24px; z-index: 9;
       background: #e30613; color: #fff; border: none; border-radius: 999px;
-      padding: 0.6rem 1rem; display: none; /* hidden by default; vendor bubble will appear */
+      padding: 0.6rem 1rem; display: none;
       box-shadow: 0 6px 18px rgba(0,0,0,.25);
     }
   </style>
@@ -102,10 +102,8 @@
 
   <div class="footer">Powered by BioBridge Global | HALO AI Assistant</div>
 
-  <!-- Optional helper button (kept hidden unless you decide to use it) -->
-  <button id="openSupportBtn" class="open-support" type="button">
-    Open Support
-  </button>
+  <!-- Optional helper button -->
+  <button id="openSupportBtn" class="open-support" type="button">Open Support</button>
 
   <script>
     const chatBox = document.getElementById("chatBox");
@@ -157,22 +155,27 @@
   </script>
 
   <!-- ====================== HALO EMBED (Option A) ====================== -->
-  <!-- Put the config and script at the VERY END of the body -->
+  <!-- Required container for the Halo chat widget -->
+  <div id="halo-chat" style="position: fixed; right: 24px; bottom: 24px; z-index: 9999;"></div>
+
   <script>
-    // Required global config per docs
+    // Global config (required)
     var haloChatConfig = {
       chatServiceUrl: "https://agent-support.qualtexlabs.org/api",
       configId: "c68ef4cb-6e6b-4ca0-8d8b-cee97181eb41",
       configKey: "ba8f6b7f-b61c-408c-ab04-3d61cc0e7af7"
     };
+    console.log("[Halo] Config loaded", haloChatConfig);
+  </script>
 
-    </script>
+  <!-- Vendor script -->
   <script src="https://agent-support.qualtexlabs.org/chat/index.js" defer></script>
 
   <script>
-    // Example: automatically set colour on load using Events API (optional)
+    // Override color and start step using Events API
     window.addEventListener('load', () => {
       try {
+        console.log("[Halo] Dispatching initialize event");
         window.dispatchEvent(new CustomEvent("haloChat_inboundEvent_initialize", {
           detail: {
             configId: "c68ef4cb-6e6b-4ca0-8d8b-cee97181eb41",
@@ -184,18 +187,17 @@
         console.warn("Halo initialize override failed:", e);
       }
 
-      // Example: wire optional helper button to open the chat at a step (kept hidden by default)
+      // Optional: link button to open chat manually
       const btn = document.getElementById('openSupportBtn');
-      btn.addEventListener('click', () => {
-        window.dispatchEvent(new CustomEvent("haloChat_inboundEvent_openChatWindow", {
-          detail: {
-            id_token: window.__HALO_ID_TOKEN__ || null,   // set this from your server if you use identity/JWT
-            retainPreviousChat: true,
-            // Enable this only if that step is configured to allow starting:
-            // startStepOverride: 9
-          }
-        }));
-      });
+      if (btn) {
+        btn.addEventListener('click', () => {
+          window.dispatchEvent(new CustomEvent("haloChat_inboundEvent_openChatWindow", {
+            detail: {
+              retainPreviousChat: true
+            }
+          }));
+        });
+      }
     });
   </script>
   <!-- ==================== END HALO EMBED (Option A) ==================== -->
