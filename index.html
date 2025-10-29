@@ -38,15 +38,14 @@
     .chat-box { padding: 1rem; height: 600px; overflow-y: auto; }
     .message { display: flex; align-items: flex-start; margin-bottom: 1rem; }
     .message .avatar {
-      width: 36px; height: 36px; border-radius: 50%; background-color: #ccc;
+      width: 36px; height: 36px; border-radius: 50%;
+      background-color: #ccc;
       display: flex; align-items: center; justify-content: center;
       font-weight: bold; color: white; margin-right: 0.75rem;
     }
     .message.user .avatar { background-color: #e30613; }
     .message.bot .avatar { background-color: #555; }
-    .bubble {
-      background: #f0f0f0; padding: 0.75rem 1rem; border-radius: 16px; max-width: 80%;
-    }
+    .bubble { background: #f0f0f0; padding: 0.75rem 1rem; border-radius: 16px; max-width: 80%; }
     body.dark .bubble { background: #444; }
 
     .input-container { display: flex; padding: 1rem; background: #f9f9f9; }
@@ -65,6 +64,7 @@
       cursor: pointer;
       font-weight: 600;
     }
+
     .footer { text-align: center; margin: 1rem; font-size: 0.85rem; color: #888; }
 
     .typing-indicator {
@@ -72,6 +72,14 @@
       font-style: italic; animation: blink 1.5s steps(1) infinite;
     }
     @keyframes blink { 50% { opacity: 0.2; } }
+
+    /* Optional: helper button to programmatically open chat using Events API */
+    .open-support {
+      position: fixed; right: 24px; bottom: 24px; z-index: 9;
+      background: #e30613; color: #fff; border: none; border-radius: 999px;
+      padding: 0.6rem 1rem; display: none; /* hidden by default; vendor bubble will appear */
+      box-shadow: 0 6px 18px rgba(0,0,0,.25);
+    }
   </style>
 </head>
 <body>
@@ -93,6 +101,11 @@
   </div>
 
   <div class="footer">Powered by BioBridge Global | HALO AI Assistant</div>
+
+  <!-- Optional helper button (kept hidden unless you decide to use it) -->
+  <button id="openSupportBtn" class="open-support" type="button">
+    Open Support
+  </button>
 
   <script>
     const chatBox = document.getElementById("chatBox");
@@ -143,18 +156,48 @@
     }
   </script>
 
-  <!-- ---------------- Vendor embed (Option A) ---------------- -->
-  <!-- add this exactly at the END of your html body -->
+  <!-- ====================== HALO EMBED (Option A) ====================== -->
+  <!-- Put the config and script at the VERY END of the body -->
   <script>
+    // Required global config per docs
     var haloChatConfig = {
       chatServiceUrl: "https://agent-support.qualtexlabs.org/api",
       configId: "c68ef4cb-6e6b-4ca0-8d8b-cee97181eb41",
       configKey: "ba8f6b7f-b61c-408c-ab04-3d61cc0e7af7"
     };
-  </script>
+
+    </script>
   <script src="https://agent-support.qualtexlabs.org/chat/index.js" defer></script>
-  <!-- ---------------------------------------------------------- -->
+
+  <script>
+    // Example: automatically set colour on load using Events API (optional)
+    window.addEventListener('load', () => {
+      try {
+        window.dispatchEvent(new CustomEvent("haloChat_inboundEvent_initialize", {
+          detail: {
+            configId: "c68ef4cb-6e6b-4ca0-8d8b-cee97181eb41",
+            configKey: "ba8f6b7f-b61c-408c-ab04-3d61cc0e7af7",
+            colour: "#e30613"
+          }
+        }));
+      } catch (e) {
+        console.warn("Halo initialize override failed:", e);
+      }
+
+      // Example: wire optional helper button to open the chat at a step (kept hidden by default)
+      const btn = document.getElementById('openSupportBtn');
+      btn.addEventListener('click', () => {
+        window.dispatchEvent(new CustomEvent("haloChat_inboundEvent_openChatWindow", {
+          detail: {
+            id_token: window.__HALO_ID_TOKEN__ || null,   // set this from your server if you use identity/JWT
+            retainPreviousChat: true,
+            // Enable this only if that step is configured to allow starting:
+            // startStepOverride: 9
+          }
+        }));
+      });
+    });
+  </script>
+  <!-- ==================== END HALO EMBED (Option A) ==================== -->
 </body>
 </html>
-
-
