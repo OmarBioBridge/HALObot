@@ -1,18 +1,20 @@
 <div id="halo-chat"></div>
 <script>
   var haloChatConfig = {
-    // Use Railway proxy
     chatServiceUrl: "https://halo-cors-proxy-production.up.railway.app/api",
 
-    // Your real config
     configId: "c68ef4cb-6e6b-4ca0-8d8b-cee97181eb41",
     configKey: "ba8f6b7f-b61c-408c-ab04-3d61cc0e7af7",
 
-    // Helpful while testing
+    // Debug + don’t hide anything
     debug: true,
     keepChatWindowOpen: true,
-    retainPreviousChat: true
-    // Make sure you are NOT setting hideNewChatBubble: true
+    retainPreviousChat: true,
+    hideNewChatBubble: false,
+    hideExistingChatBubble: false,
+    position: "bottom-right"
   };
 </script>
 <script src="https://agent-support.qualtexlabs.org/chat/index.js"></script>
+
+
