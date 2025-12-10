@@ -1,28 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>Halo Chat Test – BBG</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-  </head>
-  <body>
-    <h1>Halo Chat Test</h1>
-    <p>If everything is configured correctly, a chat bubble should appear in the corner.</p>
+<div id="halo-chat"></div>
+<script>
+  var haloChatConfig = {
+    // ✅ Use your Railway proxy instead of agent-support.qualtexlabs.org
+    chatServiceUrl: "https://halo-cors-proxy-production.up.railway.app/api",
 
-    <div id="halo-chat"></div>
-    <script>
-      var haloChatConfig = {
-        chatServiceUrl: "https://agent-support.qualtexlabs.org/api",
-        configId: "c68ef4cb-6e6b-4ca0-8d8b-cee97181eb41",
-        configKey: "ba8f6b7f-b61c-408c-ab04-3d61cc0e7af7",
+    // ✅ Your real Halo chat profile config
+    configId: "c68ef4cb-6e6b-4ca0-8d8b-cee97181eb41",
+    configKey: "ba8f6b7f-b61c-408c-ab04-3d61cc0e7af7",
 
-        // Optional cosmetic/settings tweaks:
-        colour: "#B5121B",       // BBG-ish red for bubble/window
-        theme: "light",          // or "dark"
-        keepChatWindowOpen: true,
-        retainPreviousChat: true
-      };
-    </script>
-    <script src="https://agent-support.qualtexlabs.org/chat/index.js"></script>
-  </body>
-</html>
+    // Optional nice-to-haves
+    theme: "light",
+    keepChatWindowOpen: true,
+    retainPreviousChat: true,
+    debug: true  // turn this on for now so you see logs in the console
+  };
+</script>
+<script src="https://agent-support.qualtexlabs.org/chat/index.js"></script>
