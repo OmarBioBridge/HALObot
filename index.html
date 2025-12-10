@@ -3,113 +3,28 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Halo Ticket Assistant</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-
-<style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f1f2f5;
-      color: #333;
-      transition: background-color 0.3s, color 0.3s;
-    }
-    body.dark { background-color: #1e1e1e; color: #e0e0e0; }
-
-    .header { background-color: #e30613; padding: 1.5rem; text-align: center; position: relative; }
-    .header img { max-width: 200px; margin-bottom: 10px; }
-    h1 { font-size: 1.8rem; margin: 0; color: white; }
-
-    .toggle-container { position: absolute; top: 1rem; right: 1rem; color: white; font-weight: 600; }
-    .toggle-container input { cursor: pointer; }
-
-    .chat-container {
-      max-width: 600px;
-      margin: 2rem auto;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      transition: background 0.3s;
-    }
-    body.dark .chat-container { background: #2a2a2a; }
-
-    .chat-box { padding: 1rem; height: 600px; overflow-y: auto; }
-    .message { display: flex; align-items: flex-start; margin-bottom: 1rem; }
-    .message .avatar {
-      width: 36px; height: 36px; border-radius: 50%;
-      background-color: #ccc;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: bold; color: white; margin-right: 0.75rem;
-    }
-    .message.user .avatar { background-color: #e30613; }
-    .message.bot .avatar { background-color: #555; }
-
-    .bubble { background: #f0f0f0; padding: 0.75rem 1rem; border-radius: 16px; max-width: 80%; }
-    body.dark .bubble { background: #444; }
-
-    .input-container { display: flex; padding: 1rem; background: #f9f9f9; }
-    body.dark .input-container { background: #1a1a1a; }
-
-    input[type="text"] {
-      flex: 1; padding: 0.75rem 1rem; font-size: 1rem;
-      border: 1px solid #ccc; border-radius: 12px; margin-right: 0.5rem; outline: none;
-    }
-    button {
-      padding: 0.75rem 1rem;
-      background-color: #e30613;
-      border: none;
-      color: white;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-
-    .footer { text-align: center; margin: 1rem; font-size: 0.85rem; color: #888; }
-
-</style>
+<title>Halo Chat Basic Test</title>
 </head>
 
 <body>
-<div class="toggle-container">
-<label><input type="checkbox" id="darkToggle" /> 🌙 Dark Mode</label>
-</div>
 
-<div class="header">
-  <img src="https://regenmedsa.org/wp-content/uploads/sites/49/2020/11/BBG_large.jpg" alt="BBG Logo"/>
-  <h1>Halo Ticket Assistant</h1>
-</div>
+<h2>Halo Chat Test Page</h2>
+<p>This simple page loads the Halo chat widget through your Railway CORS proxy.</p>
 
-<div class="chat-container">
-  <div class="chat-box" id="chatBox"></div>
-  <div class="input-container">
-    <input type="text" id="messageInput" placeholder="Type your message..."/>
-    <button onclick="sendMessage()">Send</button>
-  </div>
-</div>
-
-<div class="footer">Powered by BioBridge Global | HALO AI Assistant</div>
-
-<script src="script%20(1).js"></script>
-
-
-<!-- ========================================================= -->
-<!-- HALO CHAT WIDGET + OPEN CHAT BUTTON -->
-<!-- ========================================================= -->
-
-<!-- Button to force chat window open -->
+<!-- Button to force open the chat window -->
 <button 
-  style="position: fixed; bottom: 95px; right: 24px; z-index: 999999; padding: 10px 16px; border-radius: 10px;"
+  style="padding: 10px 16px; font-size: 16px; cursor: pointer;"
   onclick="window.dispatchEvent(new CustomEvent('haloChat_inboundEvent_openChatWindow', { detail: { retainPreviousChat: true }}));">
   Open Halo Chat
 </button>
 
+<br><br>
+
 <!-- Halo chat widget container -->
-<div id="halo-chat" style="position: fixed; right: 24px; bottom: 24px; z-index: 99999;"></div>
+<div id="halo-chat" style="position: fixed; right: 24px; bottom: 24px;"></div>
 
 <script>
+  // Halo chat configuration
   var haloChatConfig = {
     chatServiceUrl: "https://halo-cors-proxy-production.up.railway.app/api",
 
@@ -117,16 +32,18 @@
     configKey: "ba8f6b7f-b61c-408c-ab04-3d61cc0e7af7",
 
     debug: true,
+    enableInboundEvents: true,
+
+    hideNewChatBubble: false,
+    hideExistingChatBubble: false,
+
     keepChatWindowOpen: true,
     retainPreviousChat: true,
 
-    enableInboundEvents: true,     // REQUIRED for button to work
-    hideNewChatBubble: false,      // ensure bubble shows
-    hideExistingChatBubble: false,
     position: "bottom-right"
   };
 
-  // Show debug log when chat initializes
+  // Log when chat initializes
   window.addEventListener("haloChat_outboundEvent_initialized", function(event) {
     console.log("Halo Chat Initialized:", event.detail);
   });
