@@ -1,30 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Halo Chat Basic Test</title>
-</head>
-
-<body>
-
-<h2>Halo Chat Test Page</h2>
-<p>This simple page loads the Halo chat widget through your Railway CORS proxy.</p>
-
-<!-- Button to force open the chat window -->
-<button 
-  style="padding: 10px 16px; font-size: 16px; cursor: pointer;"
-  onclick="window.dispatchEvent(new CustomEvent('haloChat_inboundEvent_openChatWindow', { detail: { retainPreviousChat: true }}));">
-  Open Halo Chat
-</button>
-
-<br><br>
-
-<!-- Halo chat widget container -->
 <div id="halo-chat" style="position: fixed; right: 24px; bottom: 24px;"></div>
 
 <script>
-  // Halo chat configuration
   var haloChatConfig = {
     chatServiceUrl: "https://halo-cors-proxy-production.up.railway.app/api",
 
@@ -43,13 +19,9 @@
     position: "bottom-right"
   };
 
-  // Log when chat initializes
   window.addEventListener("haloChat_outboundEvent_initialized", function(event) {
     console.log("Halo Chat Initialized:", event.detail);
   });
 </script>
 
 <script src="https://agent-support.qualtexlabs.org/chat/index.js"></script>
-
-</body>
-</html>
